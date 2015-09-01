@@ -83,3 +83,7 @@ form input[type=text] {
     padding: 10px;
 }
 
+p {
+    display: inline-block;
+    padding-left: 10px;
+}

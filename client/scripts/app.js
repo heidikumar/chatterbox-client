@@ -1,11 +1,20 @@
 var app = {
-  server : 'https://api.parse.com/1/classes/chatterbox'
-
+  server : 'https://api.parse.com/1/classes/chatterbox',
+  rooms : {},
+  friends : [], 
+  data : undefined;
 };  
 
 // Upon page load, should fetch messages, usernames and rooms, then load those on page.
 app.init = function(){
   app.fetch();
+  //clear drop-down friends menu
+  // var chats = document.getElementById('chats');
+  // while(chats.hasChildNodes()){
+  //   chats.removeChild(chats.lastChild);
+  // }
+
+  //repopulate drop-down friends menu
 };
 
 
@@ -26,9 +35,9 @@ app.send = function(message){
   });
 };
 
-window.data = null;
+window.data = null; //for testing purposes only!
 
-app.fetch = function(){
+app.fetch = function(callback){
     $.ajax({
     // This is the url you should use to communicate with the parse API server.
     url: this.server,
@@ -38,10 +47,16 @@ app.fetch = function(){
       console.log('We got data back');
       window.data = data.results;
         //for each object in the array we apply the addMessage function
-        for (var i=0; i<data.results.length; i++){
-          console.log(data.results[i]);
-          // app.addMessage(data.results[i]);
-        }
+        // for (var i=0; i<data.results.length; i++){
+        //     if(data.results[i].match(/^[0-9a-zA-Z]{1,16}$/)){
+        //       console.log(data.results[i]);
+        //     }
+        //     else{
+        //        var errorMessage = "Data contains illegal characters."
+        //        return errorMessage;
+        //     }
+        //   // app.addMessage(data.results[i]);
+        // }
           //therefore, DOM will show current messages.
     },
     error: function (data) {
@@ -63,43 +78,70 @@ app.addMessage = function(message){
 
   var superNode = document.createElement('div');
 
-  // //username (clickable to add friend)
-  // var node = document.createElement('a');
-  //   //make button have class of .username
-  // var script = document.createTextNode(message.username);
-  // node.appendChild(script);
-  // superNode.appendChild(node);
+  //username
+  var userButton = document.createElement('button');
+  var userText = document.createTextNode(message.username);
+  userButton.className = "username";
+  userButton.appendChild(userText);
+  superNode.appendChild(userButton);
 
-  // //roomname (clickable to add room)
-  // var node = document.createElement('a');
-  //   //make button have class of .roomname
-  // var script = document.createTextNode(message.roomname);
-  // node.appendChild(script);
-  // superNode.appendChild(node);
 
   //message
   var node = document.createElement('p');
   var script = document.createTextNode(message.text);
   node.appendChild(script);
-  document.getElementById('chats').appendChild(node);
+  superNode.appendChild(node);
+  document.getElementById('chats').appendChild(superNode);
 
 };
 
 app.addRoom = function(room){
-  var node = document.createElement('div');
-  var room = document.createTextNode(room);
-  node.appendChild(room);
-  document.getElementById('roomSelect').appendChild(node);
+
+  //if there is a room input we will have to sort out how to handle that.
+
+  //
+
 };
 
-app.addFriend = function(){
+//                if (!app.rooms.hasOwnProperty(data.results[i].roomname)){
+//                  var keyVal = data.results[i].roomname;
+//                  app.rooms[keyVal] = keyVal;
+//                }
+//               app.addRoom();
 
-}
+// $('.username').on('click', function() {
+//   console.log('this is clicking');
+//  app.addFriend();
+// });
+
+// app.addFriend = function(){
+//  app.friends.push(message.username);
+//  var superFriendList = document.createElement('div');
+//  var friendList = document.createTextNode(message.username);
+//  superFriendList.className = "friendlist";
+//  superFriendList.appendChild(friendlist);
+//  console.log(message.username);
+// }
+
+
+// app.addFriend = function(){
+//   $(this).on('click', function(){
+//     console.log('clicking');
+//     var friend = $(this).closest('#chats').find('.userName');
+//     app.friends.push(friend);
+//   })
+// }
 
 
 
 
 
+  // //roomName
+  // var roomName = document.createElement('button');
+  // var roomText = document.createTextNode(message.roomname);
+  // roomName.id = "roomSelect";
+  // roomName.appendChild(roomText);
+  // superNode.appendChild(roomName);
 
 
 //THIS TOTALLY WORKS BUT IS NOT WHAT THEY ASKED FOR!!!!
