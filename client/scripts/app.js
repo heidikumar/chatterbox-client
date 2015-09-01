@@ -16,11 +16,20 @@ $(document).on('click', '.refresh', function(){
   app.init();
 })
 
+$(document).on('click', '.send', function() {
+  var newMessage = {};
+  $('.form').each(function() {
+    newMessage[username] = this.username,
+    newMessage[roomname] = this.roomname,
+    newMessage[text] = this.text
+  })
+  console.log(newMessage);
+})
+
   var app = {
     server : 'https://api.parse.com/1/classes/chatterbox',
     rooms : [],
-    friends : [], 
-    data : undefined
+    friends : []
   };  
   // Upon page load, should fetch messages, usernames and rooms, then load those on page.
   app.init = function(){
