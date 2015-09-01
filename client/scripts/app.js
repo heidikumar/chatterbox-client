@@ -37,7 +37,7 @@ $('.get').on('click', function(){
     // This is the url you should use to communicate with the parse API server.
     url: 'https://api.parse.com/1/classes/chatterbox',
     type: 'GET',
-    dataType: 'json',
+    contentType: 'application/json',
     success: function (data) {
       console.log('We got data back');
     },
