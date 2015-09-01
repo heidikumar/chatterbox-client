@@ -28,6 +28,7 @@ describe('chatterbox', function() {
       });
 
       it('should submit a POST request via $.ajax', function(done){
+        // debugger;
         app.send([]);
         expect($.ajax.calledOnce).to.be.true;
         // sinon.spy method `args` comes in the form [function calls][arguments from that call]
