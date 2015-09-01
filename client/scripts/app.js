@@ -35,13 +35,14 @@ app.fetch = function(){
     type: 'GET',
     contentType: 'application/json',
     success: function (data) {
-      window.data = data;
+      console.log('We got data back');
+      window.data = data.results;
         //for each object in the array we apply the addMessage function
-        for (var i=0; i<data.length; i++){
-          app.addMessage(data[i]);
+        for (var i=0; i<data.results.length; i++){
+          console.log(data.results[i]);
+          // app.addMessage(data.results[i]);
         }
           //therefore, DOM will show current messages.
-      console.log('We got data back');
     },
     error: function (data) {
       // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -62,19 +63,19 @@ app.addMessage = function(message){
 
   var superNode = document.createElement('div');
 
-  //username (clickable to add friend)
-  var node = document.createElement('a');
-    //make button have class of .username
-  var script = document.createTextNode(message.username);
-  node.appendChild(script);
-  superNode.appendChild(node);
+  // //username (clickable to add friend)
+  // var node = document.createElement('a');
+  //   //make button have class of .username
+  // var script = document.createTextNode(message.username);
+  // node.appendChild(script);
+  // superNode.appendChild(node);
 
-  //roomname (clickable to add room)
-  var node = document.createElement('a');
-    //make button have class of .roomname
-  var script = document.createTextNode(message.roomname);
-  node.appendChild(script);
-  superNode.appendChild(node);
+  // //roomname (clickable to add room)
+  // var node = document.createElement('a');
+  //   //make button have class of .roomname
+  // var script = document.createTextNode(message.roomname);
+  // node.appendChild(script);
+  // superNode.appendChild(node);
 
   //message
   var node = document.createElement('p');
