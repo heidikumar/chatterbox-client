@@ -3,8 +3,9 @@ var app = {
 
 };  
 
+// Upon page load, should fetch messages, usernames and rooms, then load those on page.
 app.init = function(){
-
+  app.fetch();
 };
 
 
@@ -25,6 +26,8 @@ app.send = function(message){
   });
 };
 
+window.data = null;
+
 app.fetch = function(){
     $.ajax({
     // This is the url you should use to communicate with the parse API server.
@@ -32,12 +35,18 @@ app.fetch = function(){
     type: 'GET',
     contentType: 'application/json',
     success: function (data) {
+      window.data = data;
+        //for each object in the array we apply the addMessage function
+        for (var i=0; i<data.length; i++){
+          app.addMessage(data[i]);
+        }
+          //therefore, DOM will show current messages.
       console.log('We got data back');
     },
     error: function (data) {
       // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
-      console.log('failed to get anything');
-      // console.error('chatterbox: Failed to send message');
+      // console.log('failed to get anything');
+      console.error('chatterbox: Failed to send message');
     }
   });
 };
