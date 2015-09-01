@@ -1,10 +1,20 @@
 $(document).ready(function(){
+  app.init();
+  $('.room').hide();
+  $('#roomSelect').change(function(){
+    $('.room').hide();
+    $('#'+$(this).val()).show();
+  })
 })
 
 $(document).on('click', '.username', function(){
-    console.log('this is clicking');
-    app.addFriend();
+    var text = $(this).text();
+    app.addFriend(text);
   });
+
+$(document).on('click', '.refresh', function(){
+  app.init();
+})
 
   var app = {
     server : 'https://api.parse.com/1/classes/chatterbox',
@@ -15,10 +25,6 @@ $(document).on('click', '.username', function(){
   // Upon page load, should fetch messages, usernames and rooms, then load those on page.
   app.init = function(){
     app.fetch();
-    //clear drop-down friends menu
-    //refill drop-down friends menu
-        //we need the friends menu to be a node connected to all the messages, such that the messages will display when we select the correct room.
-
   };
 
   app.send = function(message){
@@ -40,7 +46,7 @@ $(document).on('click', '.username', function(){
 
   window.data = null; //for testing purposes only!
 
-  app.fetch = function(callback){
+  app.fetch = function(){
       $.ajax({
       // This is the url you should use to communicate with the parse API server.
       url: this.server,
@@ -48,19 +54,37 @@ $(document).on('click', '.username', function(){
       contentType: 'application/json',
       success: function (data) {
         console.log('We got data back');
-        window.data = data.results;
+        // window.data = data.results;
           //for each object in the array we apply the addMessage function
-          // for (var i=0; i<data.results.length; i++){
-          //     if(data.results[i].match(/^[0-9a-zA-Z]{1,16}$/)){
-          //       console.log(data.results[i]);
-          //     }
-          //     else{
-          //        var errorMessage = "Data contains illegal characters."
-          //        return errorMessage;
-          //     }
+          for (var i=0; i<data.results.length; i++){
+            var results = data.results[i];
+            if (results.text === undefined || results.username === undefined || results.roomname === undefined){
+              continue;
+            }
+            if (results.text === null || results.username === null  || results.roomname === null){
+              continue;
+            }
+              if(results.text.match(/^[0-9a-zA-Z -]{1,16}$/)){
+                if(results.username.match(/^[0-9a-zA-Z -]{1,16}$/)){
+                  if(results.roomname.match(/^[0-9a-zA-Z -]{1,16}$/)){
+                      console.log("This worked: " + data.results[i].text);
+                      app.addMessage(results);
+                  }
+                }
+              }
+              else{
+                 var errorMessage = "Data contains illegal characters."
+                 console.log(errorMessage);
+              }
+          }
+
+    /*
+      Things that need to happen in fetch:
+        needs to screen for escape characters
+        needs to call add message on each message
+    */
           //   // app.addMessage(data.results[i]);
-          // }
-            //therefore, DOM will show current messages.
+          //therefore, DOM will show current messages.
       },
       error: function (data) {
         // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -82,10 +106,10 @@ $(document).on('click', '.username', function(){
     // var superNode = document.createElement('div');
     //rather than superNode, create div room and append
     //check if room already exists
-    if (!document.getElementById(message.room)){
-      app.addRoom(message.room);
+    var name = "" + message.roomname + "";
+    if (!document.getElementById(name)){
+      app.addRoom(name);
     }
-    var name = "" +message.room + "";
     var superNode = document.getElementById(name);
 
     //username
@@ -98,6 +122,8 @@ $(document).on('click', '.username', function(){
     //message
     var node = document.createElement('p');
     var script = document.createTextNode(message.text);
+    var nameClass = "" + message.username + "";
+    node.className = nameClass;
     node.appendChild(script);
     superNode.appendChild(node);
     document.getElementById('chats').appendChild(superNode);
@@ -109,16 +135,17 @@ $(document).on('click', '.username', function(){
 
   app.addRoom = function(room){
     //in our array for possible future use
-    app.rooms.push(message.room);
+    app.rooms.push(room);
     //adding room to selection menu
     var newRoom = document.createElement('option');
-    newRoom.value = message.room;
-    newRoom.text = message.room;
+    newRoom.value = room;
+    newRoom.text = room;
     document.getElementById('roomSelect').appendChild(newRoom);
 
     //adding div to .chats class's div
     var divRoom = document.createElement('div');
-    divRoom.id = message.room;
+    divRoom.id = room;
+    divRoom.className = "room";
     document.getElementById('chats').appendChild(divRoom);
 
     //if there is a room input we will have to sort out how to handle that.
@@ -128,94 +155,38 @@ $(document).on('click', '.username', function(){
   };
 
 
-  app.addFriend = function(){
-   app.friends.push(message.username);
+  app.addFriend = function(name){
+    //we need to grab the text from the button and use that (instead of message.username)
+
+   app.friends.push(name);
    var superFriendList = document.createElement('div');
-   var friendList = document.createTextNode(message.username);
+   var friendList = document.createTextNode(name);
    superFriendList.id = "friendlist";
    superFriendList.appendChild(friendList);
    //where are we adding the superFriendList? 
    document.getElementById('friendsList').appendChild(superFriendList);
-   console.log(message.username);
+
+   //select all friends of the class
+    var elementsArray = document.getElementsByClassName(name);
+   //apply styling to that element to make the text bold
+    for (var i=0; i<elementsArray.length; i++){
+      elementsArray[i].style.fontWeight = "bold";
+    }
+
   }
 
 
+/*
 
-//                if (!app.rooms.hasOwnProperty(data.results[i].roomname)){
-//                  var keyVal = data.results[i].roomname;
-//                  app.rooms[keyVal] = keyVal;
-//                }
-//               app.addRoom();
-//           
+TO DO LIST:
 
-
-
-// app.addFriend = function(){
-//   $(this).on('click', function(){
-//     console.log('clicking');
-//     var friend = $(this).closest('#chats').find('.userName');
-//     app.friends.push(friend);
-//   })
+1. need to add a class for the friends name when the message is created  (CHECK)
+2. be able to turn all friends of that class to be bold in add friend (CHECK)
+3. need to add a way to toggle between rooms where only messages in that room's div are shown (CHECK)
 
 
 
+*/
 
 
-  // //roomName
-  // var roomName = document.createElement('button');
-  // var roomText = document.createTextNode(message.roomname);
-  // roomName.id = "roomSelect";
-  // roomName.appendChild(roomText);
-  // superNode.appendChild(roomName);
 
-
-//THIS TOTALLY WORKS BUT IS NOT WHAT THEY ASKED FOR!!!!
-
-// $(document).ready(function(){
-
-// //function to send messages
-
-// $('.send').on('click', function(){
-//   // console.log('button working');
-//   var message = {};
-//   message.username = "Heidi and Tad's Excellent Adventures"
-//   message.text = "Please don't hack us!"
-//   message.room = "The Floor of Awesomeness"
-//     $.ajax({
-//     // This is the url you should use to communicate with the parse API server.
-//     url: 'https://api.parse.com/1/classes/chatterbox',
-//     type: 'POST',
-//     data: JSON.stringify(message),
-//     contentType: 'application/json',
-//     success: function (data) {
-//       console.log('chatterbox: Message sent');
-//     },
-//     error: function (data) {
-//       // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
-//       console.error('chatterbox: Failed to send message');
-//     }
-//   });
-// })
-
-// //function to get messages
-//   //this needs to be within a function, but for now we are putting it in a button for testing
-
-// $('.get').on('click', function(){
-
-//     $.ajax({
-//     // This is the url you should use to communicate with the parse API server.
-//     url: 'https://api.parse.com/1/classes/chatterbox',
-//     type: 'GET',
-//     contentType: 'application/json',
-//     success: function (data) {
-//       console.log('We got data back');
-//     },
-//     error: function (data) {
-//       // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
-//       console.log('failed to get anything');
-//       // console.error('chatterbox: Failed to send message');
-//     }
-//   });
-
-// })
-// });
